@@ -1,14 +1,23 @@
-import { all, fork } from 'redux-saga/effects'
+import { all, race, take, call } from 'redux-saga/effects'
 import { createStore, applyMiddleware, compose, combineReducers } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import drizzleSagas from './rootSaga'
 import drizzleReducers from './reducer'
 import { generateContractsInitialState } from './contractStateUtils'
 import drizzleMW from './drizzle-middleware'
+import { DRIZZLE_STOPPING } from './drizzleStatus/constants'
+
+function * watchDrizzleStop() {
+  yield take(DRIZZLE_STOPPING)
+  console.log('Drizzle stopping.')
+}
 
 const composeSagas = sagas =>
   function * () {
-    yield all(sagas.map(fork))
+    yield race([
+      all(sagas.map(call)),
+      call(watchDrizzleStop)
+    ])
   }
 
 /**
@@ -50,7 +59,7 @@ export function generateStore ({
     ? global.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
     : compose
 
-  let initialContractsState = {
+  const initialContractsState = {
     contracts: generateContractsInitialState(drizzleOptions)
   }
 

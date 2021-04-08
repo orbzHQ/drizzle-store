@@ -56,6 +56,13 @@ class Drizzle {
 
     this.loadingContract = {}
 
+    this.stop = () => {
+      this.store.dispatch({
+        type: DrizzleActions.DRIZZLE_STOPPING,
+        drizzle: this
+      })
+    }
+
     // Wait for window load event in case of injected web3.
     isEnvReadyPromise.then(() => {
       // Begin Drizzle initialization.
