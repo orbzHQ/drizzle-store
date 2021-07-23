@@ -9,7 +9,6 @@ import { DRIZZLE_STOPPING } from './drizzleStatus/constants'
 
 function * watchDrizzleStop() {
   yield take(DRIZZLE_STOPPING)
-  console.log('Drizzle stopping.')
 }
 
 const composeSagas = sagas =>
